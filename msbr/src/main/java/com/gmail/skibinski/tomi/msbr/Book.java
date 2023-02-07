@@ -16,6 +16,10 @@ public class Book {
 
     }
 
+    public Book(String title, String authorFirstName, String authorLastName) {
+        
+    }
+
     public Book(int id, String title, String authorFirstName, String authorLastName, String studentFirstName, String studentLastName, Date checkoutDate) {
         this.id = id;
         this.title = title;

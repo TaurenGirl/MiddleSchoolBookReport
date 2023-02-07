@@ -13,9 +13,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * JavaFX App
@@ -31,6 +33,9 @@ public class App extends Application {
     private Label authorLabel;
     private Label studentLabel;
     private Label checkoutLabel;
+
+    private DBWriter dbWriter;
+    private File db = new File("MSBRDatabase.txt");
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -80,8 +85,8 @@ public class App extends Application {
 
         table.getColumns().addAll(idCol,titleCol,afCol,alCol,sfCol,slCol,checkCol);
 
-        table.getItems().add(new Book(1, "Pride and Prejudice", "Jane", "Austin", "John", "Smith", new Date()));
-        table.getItems().add(new Book(2, "The Hobbit", "J.R.R.", "Tolkein", "Jane", "Doe", new Date()));
+        //table.getItems().add(new Book(1, "Pride and Prejudice", "Jane", "Austin", "John", "Smith", new Date()));
+        //table.getItems().add(new Book(2, "The Hobbit", "J.R.R.", "Tolkein", "Jane", "Doe", new Date()));
 
         GridPane dataPane = new GridPane();
         dataPane.setHgap(10);
@@ -114,7 +119,11 @@ public class App extends Application {
         dataPane.add(checkoutButton,0,5);
 
         addBookMenuItem.setOnAction(e -> {
-            table.getItems().add(addBookDialog().showAndWait().orElse(null));
+            dbWriter = new DBWriter();
+            Book book = addBookDialog().showAndWait().orElse(null);
+            book.setId(dbWriter.getId(db.toPath()));
+            dbWriter.write(book, db);
+            //table.getItems().add(addBookDialog().showAndWait().orElse(null));
 
         });
 
@@ -207,7 +216,7 @@ public class App extends Application {
         //convert input to Book
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButtonType) {
-                return new Book(1, title.getText(), firstName.getText(), lastName.getText(), "", "", new Date());
+                return new Book(0, title.getText(), firstName.getText(), lastName.getText(), "", "", null);
             }
             return null;
         });
