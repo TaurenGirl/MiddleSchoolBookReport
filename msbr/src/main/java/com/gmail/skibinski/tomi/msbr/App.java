@@ -35,6 +35,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         VBox root = new VBox();
+        root.setStyle("-fx-background-color: Beige;");
 
         Menu editMenu = new Menu("Edit");
         
@@ -86,6 +87,7 @@ public class App extends Application {
         dataPane.setHgap(10);
         dataPane.setVgap(2);
         dataPane.setPadding(new Insets(10, 10, 10, 10));
+        dataPane.setStyle("-fx-background-color: Beige;");
         Font font = new Font(36);
         idLabel = new Label("id: ");
         idLabel.setFont(font);
@@ -102,6 +104,7 @@ public class App extends Application {
         checkoutButton.setMinWidth(128);
         checkoutButton.setPrefHeight(48);
         checkoutButton.setFont(font);
+        checkoutButton.setStyle("-fx-background-radius: 24px; -fx-background-color: darkslateblue; -fx-text-fill: white;");
 
         dataPane.add(idLabel,0,0);
         dataPane.add(titleLabel,0,1);
@@ -132,6 +135,7 @@ public class App extends Application {
 
         scene = new Scene(root, 640, 480);
         stage.setScene(scene);
+        stage.setTitle("Middle School Book Report");
         stage.show();
     }
 
@@ -228,6 +232,7 @@ public class App extends Application {
         CheckBox studentBox = new CheckBox("Student");
         studentBox.setSelected(true);
         Button searchButton = new Button("search");
+        searchButton.setStyle("-fx-background-radius: 9px; -fx-background-color: darkslateblue; -fx-text-fill: white;");
 
         grid.add(searchTF,0,0);
         GridPane.setColumnSpan(searchTF, 4);
