@@ -1,130 +1,27 @@
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.MenuListener;
-import javax.swing.table.DefaultTableModel;
+import javafx.*;
+import javafx.application.*;
+import javafx.event.*;
+import javafx.scene.*;
+import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.awt.*;
-import java.awt.Font;
-import java.awt.event.*;
 
 
-public class MSBR {
-    
-    JFrame frame;
-    JScrollPane sp;
-    JMenuBar menuBar;
-    JMenu optionsMenu;
-    JMenuItem addBookMenuItem;
-    JScrollPane listScrollPane;
-    JTable listTable;
-    JPanel dataPanel;
 
-    JTextField firstTextField;
-    JTextField lasTextField;
-    JTextField checkoutTextField;
-
-    AddBookPopup addBook;
+public class MSBR extends Application {
 
     String preferencesFileName = "preferences.txt";
     
-    public MSBR() {
-        //initialize JFrame
-        frame = new JFrame();
-        frame.setTitle("Middle School Book Report");
-        frame.setSize(400, 500);
-        frame.setLayout(null);
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+       
 
-        addBook = new AddBookPopup();
-
-        menuBar = new JMenuBar();
-
-        optionsMenu = new JMenu("Options");
-
-        addBookMenuItem = new JMenuItem("Add Books");
-        addBookMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JDialog dialog = new JDialog();
-                dialog.setSize(1000, 500);
-                dialog.setTitle("Add Books");
-                dialog.add(addBook.get());
-                dialog.setVisible(true);
-                dialog.setResizable(false);
-            }
-        });
-        optionsMenu.add(addBookMenuItem);
-
-        menuBar.add(optionsMenu);
-
-
-        sp = new JScrollPane();
-
-        //initialize table data and JTable for list of data
-        String[][] listData = {{"1","Test","test", "Test","Hello","World!","Date"}, {"1","Test","Test", "Test","Hello","World!","Date"}};
-        String[] listColumnNames = {"#", "Title", "Author First", "Author Last", "Student First", "Student Last", "Checkout"};
-        listTable = new JTable(listData, listColumnNames);
-
-        //set table model of JTable so that cells are not editable
-        DefaultTableModel tableModel = new DefaultTableModel(listData, listColumnNames) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        //set properties of JTable for list of data
-        listTable.setModel(tableModel);
-        listTable.setBounds(0, 250, 400, 250);
-
-        //initialize JScrollPane to hold list of data
-        listScrollPane = new JScrollPane(listTable);
-        listScrollPane.setBounds(0, 250, 400, 250);
-        listScrollPane.setVisible(true);
-        frame.add(listScrollPane);
-
-        //initialize data panel
-        dataPanel = new JPanel();
-        GridLayout gl = new GridLayout(3, 4);
-        dataPanel.setLayout(gl);
-        dataPanel.setBounds(0, 500, 800, 250);
-
-        Font dataFont = new Font(Font.SERIF, Font.PLAIN, 48);
-
-        //layout data panel
-        JLabel titleLabel = new JLabel("");
-        titleLabel.setFont(dataFont);
-        JLabel authorLabel = new JLabel("");
-        authorLabel.setFont(dataFont);
-        dataPanel.add(titleLabel);
-        dataPanel.add(authorLabel);
-        JLabel firstLabel = new JLabel("First Name: ");
-        firstLabel.setFont(dataFont);
-        firstTextField = new JTextField(10);
-        firstTextField.setFont(dataFont);
-        JPanel firstPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        firstPanel.add(firstLabel);
-        firstPanel.add(firstTextField);
-        dataPanel.add(firstPanel);
-
-        JButton submitButton = new JButton("Submit");
-        submitButton.setFont(dataFont);
-        dataPanel.add(submitButton);
-
-        frame.add(dataPanel);
-
-        listTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent event) {
-                titleLabel.setText("Title: " + listTable.getValueAt(listTable.getSelectedRow(), 1).toString());
-                authorLabel.setText("Author: " + listTable.getValueAt(listTable.getSelectedRow(), 2).toString() + " " + listTable.getValueAt(listTable.getSelectedRow(), 3).toString());
-            }
-        });
-
-        frame.setJMenuBar(menuBar);
-
-        frame.setVisible(true);
+    StackPane root = new StackPane();
+    Scene scene = new Scene(root,600,400);
+    primaryStage.setTitle("Middle School Book Report");
+    primaryStage.setScene(scene);
+    primaryStage.show();
 
     }
 
@@ -161,8 +58,7 @@ public class MSBR {
     }
 
     public static void main(String[] args) {
-        MSBR msbr = new MSBR();
-        msbr.setName();
+        launch(args);
     }
 }
 
