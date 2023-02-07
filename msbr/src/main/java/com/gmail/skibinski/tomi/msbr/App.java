@@ -2,12 +2,12 @@ package com.gmail.skibinski.tomi.msbr;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -26,6 +26,11 @@ public class App extends Application {
     private MenuBar menuBar;
     private Group tableGroup;
     private TableView<Book> table;
+    private Label idLabel;
+    private Label titleLabel;
+    private Label authorLabel;
+    private Label studentLabel;
+    private Label checkoutLabel;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -40,6 +45,9 @@ public class App extends Application {
         menuBar = new MenuBar();
         menuBar.getMenus().add(editMenu);
         root.getChildren().add(menuBar);
+
+        root.getChildren().add(addSearchBar());
+
 
         tableGroup = new Group();
         table = new TableView<>();
@@ -74,14 +82,53 @@ public class App extends Application {
         table.getItems().add(new Book(1, "Pride and Prejudice", "Jane", "Austin", "John", "Smith", new Date()));
         table.getItems().add(new Book(2, "The Hobbit", "J.R.R.", "Tolkein", "Jane", "Doe", new Date()));
 
+        GridPane dataPane = new GridPane();
+        dataPane.setHgap(10);
+        dataPane.setVgap(2);
+        dataPane.setPadding(new Insets(10, 10, 10, 10));
+        Font font = new Font(36);
+        idLabel = new Label("id: ");
+        idLabel.setFont(font);
+        titleLabel = new Label("Title: ");
+        titleLabel.setFont(font);
+        authorLabel = new Label("Author: ");
+        authorLabel.setFont(font);
+        studentLabel = new Label("Student: ");
+        studentLabel.setFont(font);
+        checkoutLabel = new Label("Date: ");
+        checkoutLabel.setFont(font);
+
+        Button checkoutButton = new Button("checkout");
+        checkoutButton.setMinWidth(128);
+        checkoutButton.setPrefHeight(48);
+        checkoutButton.setFont(font);
+
+        dataPane.add(idLabel,0,0);
+        dataPane.add(titleLabel,0,1);
+        dataPane.add(authorLabel,0,2);
+        dataPane.add(studentLabel,0,3);
+        dataPane.add(checkoutLabel,0,4);
+        dataPane.add(checkoutButton,0,5);
+
         addBookMenuItem.setOnAction(e -> {
             table.getItems().add(addBookDialog().showAndWait().orElse(null));
 
         });
 
-        tableGroup.getChildren().add(table);
+        table.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            idLabel.setText("id: " + newValue.getId());
+            titleLabel.setText("Title: " + newValue.getTitle());
+            authorLabel.setText("Author: " + newValue.getAuthorFirstName() + " " + newValue.getAuthorLastName());
+            studentLabel.setText("Student: " + newValue.getStudentFirstName() + " " + newValue.getStudentLastName());
+            checkoutLabel.setText("Date: " + newValue.getCheckoutDate());
+        });
 
-        root.getChildren().add(tableGroup);
+        tableGroup.getChildren().add(table);
+        ScrollPane sp = new ScrollPane();
+        sp.setContent(tableGroup);
+
+        root.getChildren().add(sp);
+        root.getChildren().add(dataPane);
 
         scene = new Scene(root, 640, 480);
         stage.setScene(scene);
@@ -163,6 +210,36 @@ public class App extends Application {
         return dialog;
 
     }
+
+    public GridPane addSearchBar() {
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(2);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+
+        TextField searchTF = new TextField();
+        searchTF.setPromptText("search");
+        CheckBox idBox = new CheckBox("id");
+        idBox.setSelected(true);;
+        CheckBox titleBox = new CheckBox("Title");
+        titleBox.setSelected(true);
+        CheckBox authorBox = new CheckBox("Author");
+        authorBox.setSelected(true);
+        CheckBox studentBox = new CheckBox("Student");
+        studentBox.setSelected(true);
+        Button searchButton = new Button("search");
+
+        grid.add(searchTF,0,0);
+        GridPane.setColumnSpan(searchTF, 4);
+        grid.add(searchButton,4,0);
+        grid.add(idBox,0,1);
+        grid.add(titleBox,1,1);
+        grid.add(authorBox,2,1);
+        grid.add(studentBox,3,1);
+
+        return grid;
+    }
+
 
     static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
