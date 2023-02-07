@@ -1,15 +1,23 @@
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.MenuListener;
 import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.*;
+import java.awt.Font;
+import java.awt.event.*;
+
 
 public class MSBR {
     
     JFrame frame;
+    JScrollPane sp;
+    JMenuBar menuBar;
+    JMenu optionsMenu;
+    JMenuItem addBookMenuItem;
     JScrollPane listScrollPane;
     JTable listTable;
     JPanel dataPanel;
@@ -17,6 +25,8 @@ public class MSBR {
     JTextField firstTextField;
     JTextField lasTextField;
     JTextField checkoutTextField;
+
+    AddBookPopup addBook;
 
     String preferencesFileName = "preferences.txt";
     
@@ -26,6 +36,31 @@ public class MSBR {
         frame.setTitle("Middle School Book Report");
         frame.setSize(400, 500);
         frame.setLayout(null);
+
+        addBook = new AddBookPopup();
+
+        menuBar = new JMenuBar();
+
+        optionsMenu = new JMenu("Options");
+
+        addBookMenuItem = new JMenuItem("Add Books");
+        addBookMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog dialog = new JDialog();
+                dialog.setSize(1000, 500);
+                dialog.setTitle("Add Books");
+                dialog.add(addBook.get());
+                dialog.setVisible(true);
+                dialog.setResizable(false);
+            }
+        });
+        optionsMenu.add(addBookMenuItem);
+
+        menuBar.add(optionsMenu);
+
+
+        sp = new JScrollPane();
 
         //initialize table data and JTable for list of data
         String[][] listData = {{"1","Test","test", "Test","Hello","World!","Date"}, {"1","Test","Test", "Test","Hello","World!","Date"}};
@@ -54,19 +89,29 @@ public class MSBR {
         dataPanel = new JPanel();
         GridLayout gl = new GridLayout(3, 4);
         dataPanel.setLayout(gl);
-        dataPanel.setBounds(0, 500, 400, 250);
+        dataPanel.setBounds(0, 500, 800, 250);
+
+        Font dataFont = new Font(Font.SERIF, Font.PLAIN, 48);
 
         //layout data panel
         JLabel titleLabel = new JLabel("");
+        titleLabel.setFont(dataFont);
         JLabel authorLabel = new JLabel("");
+        authorLabel.setFont(dataFont);
         dataPanel.add(titleLabel);
         dataPanel.add(authorLabel);
         JLabel firstLabel = new JLabel("First Name: ");
-        firstTextField = new JTextField();
-        JPanel firstPanel = new JPanel(new BorderLayout());
-        firstPanel.add(firstLabel, BorderLayout.WEST);
-        firstPanel.add(firstTextField, BorderLayout.CENTER);
+        firstLabel.setFont(dataFont);
+        firstTextField = new JTextField(10);
+        firstTextField.setFont(dataFont);
+        JPanel firstPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        firstPanel.add(firstLabel);
+        firstPanel.add(firstTextField);
         dataPanel.add(firstPanel);
+
+        JButton submitButton = new JButton("Submit");
+        submitButton.setFont(dataFont);
+        dataPanel.add(submitButton);
 
         frame.add(dataPanel);
 
@@ -76,6 +121,8 @@ public class MSBR {
                 authorLabel.setText("Author: " + listTable.getValueAt(listTable.getSelectedRow(), 2).toString() + " " + listTable.getValueAt(listTable.getSelectedRow(), 3).toString());
             }
         });
+
+        frame.setJMenuBar(menuBar);
 
         frame.setVisible(true);
 
