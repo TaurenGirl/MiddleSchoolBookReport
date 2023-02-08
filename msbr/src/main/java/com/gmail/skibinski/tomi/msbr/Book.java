@@ -4,13 +4,13 @@ import java.util.Date;
 
 public class Book {
     
-    private int id;
+    private String id;
     private String title;
     private String authorFirstName;
     private String authorLastName;
     private String studentFirstName;
     private String studentLastName;
-    private Date checkoutDate;
+    private String checkoutDate;
 
     public Book() {
 
@@ -20,7 +20,7 @@ public class Book {
         
     }
 
-    public Book(int id, String title, String authorFirstName, String authorLastName, String studentFirstName, String studentLastName, Date checkoutDate) {
+    public Book(String id, String title, String authorFirstName, String authorLastName, String studentFirstName, String studentLastName, String checkoutDate) {
         this.id = id;
         this.title = title;
         this.authorFirstName = authorFirstName;
@@ -30,9 +30,9 @@ public class Book {
         this.checkoutDate = checkoutDate;
     }
 
-    public int getId() {return this.id;}
+    public String getId() {return this.id;}
 
-    public void setId(int id) {this.id = id;}
+    public void setId(String id) {this.id = id;}
 
     public String getTitle() {return this.title;}
 
@@ -54,8 +54,8 @@ public class Book {
 
     public void setStudentLastName(String studentLastName) {this.studentLastName = studentLastName;}
 
-    public Date getCheckoutDate() {return this.checkoutDate;}
+    public String getCheckoutDate() {return this.checkoutDate;}
 
-    public void setCheckoutDate(Date checkoutDate) {this.checkoutDate = checkoutDate;}
+    public void setCheckoutDate(String checkoutDate) {this.checkoutDate = checkoutDate;}
 
 }

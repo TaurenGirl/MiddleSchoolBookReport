@@ -34,7 +34,7 @@ public class App extends Application {
     private Label studentLabel;
     private Label checkoutLabel;
 
-    private DBWriter dbWriter;
+    private DBWriter dbWriter = new DBWriter();
     private File db = new File("MSBRDatabase.txt");
 
     @Override
@@ -119,10 +119,10 @@ public class App extends Application {
         dataPane.add(checkoutButton,0,5);
 
         addBookMenuItem.setOnAction(e -> {
-            dbWriter = new DBWriter();
             Book book = addBookDialog().showAndWait().orElse(null);
             book.setId(dbWriter.getId(db.toPath()));
             dbWriter.write(book, db);
+            updateTable();
             //table.getItems().add(addBookDialog().showAndWait().orElse(null));
 
         });
@@ -146,6 +146,8 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setTitle("Middle School Book Report");
         stage.show();
+
+        updateTable();
     }
 
     private Dialog<Book> addBookDialog() {
@@ -216,7 +218,7 @@ public class App extends Application {
         //convert input to Book
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButtonType) {
-                return new Book(0, title.getText(), firstName.getText(), lastName.getText(), "", "", null);
+                return new Book("", title.getText(), firstName.getText(), lastName.getText(), "", "", null);
             }
             return null;
         });
@@ -252,6 +254,13 @@ public class App extends Application {
         grid.add(studentBox,3,1);
 
         return grid;
+    }
+
+    public void updateTable() {
+        List<Book> list = dbWriter.read(db.toPath());
+        for (int i = 0; i < list.size(); i++) {
+            table.getItems().add(list.get(i));
+        }
     }
 
 
