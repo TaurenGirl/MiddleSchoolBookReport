@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +38,8 @@ public class App extends Application {
 
     private DBWriter dbWriter = new DBWriter();
     private File db = new File("MSBRDatabase.txt");
+
+    private BarcodeListener bcl = new BarcodeListener();
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -148,6 +152,15 @@ public class App extends Application {
         stage.show();
 
         updateTable();
+
+        stage.addEventHandler(KeyEvent.KEY_TYPED, (event) -> {
+            if (!event.getCharacter().equals("\r") && !event.getCharacter().equals("\n")) {
+                String bclOut = bcl.listen(event.getCharacter());
+                if (bclOut != null) {
+                    System.out.println(bclOut);
+                }
+            }
+        });
     }
 
     private Dialog<Book> addBookDialog() {
