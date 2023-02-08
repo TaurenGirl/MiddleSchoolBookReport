@@ -15,12 +15,12 @@ private boolean listen = false;
         String string = "";
         buffer = buffer + key;
         if (listen && buffer.length() == 7) {
-            string = buffer;
+            string = buffer.substring(0, 6);
             buffer = "";
             listen = false;
             return string;
         }
-        if (buffer.endsWith("07099")) {
+        if (buffer.endsWith("09181")) {
             listen = true;
             buffer = "";
         }

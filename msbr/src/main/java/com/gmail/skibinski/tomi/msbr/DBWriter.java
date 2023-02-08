@@ -56,7 +56,7 @@ public class DBWriter {
         for (int i = 0; i < str.length-1; i++) {
             Book book = new Book();
             String[] bkStr = str[i].split("!", 0);
-            book.setId(bkStr[0]);
+            book.setId(bkStr[0].stripLeading());
             book.setTitle(bkStr[1]);
             book.setAuthorFirstName(bkStr[2]);
             book.setAuthorLastName(bkStr[3]);

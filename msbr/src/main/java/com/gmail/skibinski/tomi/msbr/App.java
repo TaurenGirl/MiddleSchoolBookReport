@@ -7,19 +7,30 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.embed.swing.*;
 
 import java.io.File;
 import java.io.IOException;
 
 import java.util.Date;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.views.AbstractView;
+import org.w3c.dom.views.DocumentView;
+
 
 /**
  * JavaFX App
@@ -40,6 +51,9 @@ public class App extends Application {
     private File db = new File("MSBRDatabase.txt");
 
     private BarcodeListener bcl = new BarcodeListener();
+    private BarcodeGenerator bcg = new BarcodeGenerator();
+    private String bcFlag = "09181";
+    private BarcodePrinter bcp = new BarcodePrinter();
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -89,8 +103,6 @@ public class App extends Application {
 
         table.getColumns().addAll(idCol,titleCol,afCol,alCol,sfCol,slCol,checkCol);
 
-        //table.getItems().add(new Book(1, "Pride and Prejudice", "Jane", "Austin", "John", "Smith", new Date()));
-        //table.getItems().add(new Book(2, "The Hobbit", "J.R.R.", "Tolkein", "Jane", "Doe", new Date()));
 
         GridPane dataPane = new GridPane();
         dataPane.setHgap(10);
@@ -124,10 +136,20 @@ public class App extends Application {
 
         addBookMenuItem.setOnAction(e -> {
             Book book = addBookDialog().showAndWait().orElse(null);
-            book.setId(dbWriter.getId(db.toPath()));
+            String str = dbWriter.getId(db.toPath());
+            while (str.length() < 6) {
+                str = "0" + str;
+            }
+            book.setId(bcFlag + str);
             dbWriter.write(book, db);
             updateTable();
-            //table.getItems().add(addBookDialog().showAndWait().orElse(null));
+            //test
+            Image image = SwingFXUtils.toFXImage(bcg.generate(book.getId()), null);
+            ImageView v = new ImageView(image);
+            v.setScaleX(0.25);
+            v.setScaleY(0.25);
+            dataPane.add(v, 1, 1);
+            bcp.setup(v, stage);
 
         });
 
@@ -158,6 +180,11 @@ public class App extends Application {
                 String bclOut = bcl.listen(event.getCharacter());
                 if (bclOut != null) {
                     System.out.println(bclOut);
+                    for (int i = 0; i < table.getItems().size(); i++) {
+                    if (table.getItems().get(i).getId().equals(bcFlag + bclOut)) {
+                        table.getSelectionModel().select(table.getItems().get(i));
+                        }
+                    }
                 }
             }
         });
@@ -231,7 +258,7 @@ public class App extends Application {
         //convert input to Book
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButtonType) {
-                return new Book("", title.getText(), firstName.getText(), lastName.getText(), "", "", null);
+                return new Book("", title.getText(), firstName.getText(), lastName.getText(), "", "", "");
             }
             return null;
         });
@@ -270,6 +297,7 @@ public class App extends Application {
     }
 
     public void updateTable() {
+        table.getItems().clear();
         List<Book> list = dbWriter.read(db.toPath());
         for (int i = 0; i < list.size(); i++) {
             table.getItems().add(list.get(i));
