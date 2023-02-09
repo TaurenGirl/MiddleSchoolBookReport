@@ -30,6 +30,8 @@ public class Book {
         this.checkoutDate = checkoutDate;
     }
 
+    public Book get() {return this;}
+
     public String getId() {return this.id;}
 
     public void setId(String id) {this.id = id;}

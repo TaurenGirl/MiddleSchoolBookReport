@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DBWriter {
@@ -15,6 +16,28 @@ public class DBWriter {
 
     public DBWriter() {
 
+    }
+
+    public void amendFile(Book book, File file) {
+        List<Book> list = this.read(file.toPath());
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId().equals(book.getId())) {
+                list.get(i).setStudentFirstName(book.getStudentFirstName());
+                list.get(i).setStudentLastName(book.getStudentLastName());
+                list.get(i).setCheckoutDate(book.getCheckoutDate());
+            }
+        }
+        try {
+            FileWriter writer = new FileWriter(file, false);
+            for (int j = 0; j < list.size(); j++) {
+                String string = list.get(j).getId() + "!" + list.get(j).getTitle() + "!" + list.get(j).getAuthorFirstName() + "!" + list.get(j).getAuthorLastName() + "!" + list.get(j).getStudentFirstName() + " " + "!" + list.get(j).getStudentLastName() + " " + "!" + list.get(j).getCheckoutDate() + " " + "@" + "\n";
+                writer.write(string);
+            }
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
 
@@ -66,6 +89,13 @@ public class DBWriter {
             list.add(book);
         }
         return list;
+    }
+
+    public Book checkout(Book book, File file) {
+        Date date = new Date(); 
+        book.setCheckoutDate(date.toString());
+        this.amendFile(book, file);
+        return book;
     }
 
 }

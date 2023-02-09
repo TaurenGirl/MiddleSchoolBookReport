@@ -79,7 +79,7 @@ public class App extends Application {
         table.setPrefSize(1280, 480);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        TableColumn<Book, Integer> idCol = new TableColumn<>("id");
+        TableColumn<Book, String> idCol = new TableColumn<>("id");
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         idCol.setMinWidth(100);
         TableColumn<Book, String> titleCol = new TableColumn<>("Title");
@@ -126,6 +126,9 @@ public class App extends Application {
         checkoutButton.setPrefHeight(48);
         checkoutButton.setFont(font);
         checkoutButton.setStyle("-fx-background-radius: 24px; -fx-background-color: darkslateblue; -fx-text-fill: white;");
+        checkoutButton.setOnAction((e) -> {
+            addSimpleCheckoutDialog(table.getSelectionModel().getSelectedItem()).showAndWait().orElse(null);
+        });
 
         dataPane.add(idLabel,0,0);
         dataPane.add(titleLabel,0,1);
@@ -154,11 +157,19 @@ public class App extends Application {
         });
 
         table.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            idLabel.setText("id: " + newValue.getId());
-            titleLabel.setText("Title: " + newValue.getTitle());
-            authorLabel.setText("Author: " + newValue.getAuthorFirstName() + " " + newValue.getAuthorLastName());
-            studentLabel.setText("Student: " + newValue.getStudentFirstName() + " " + newValue.getStudentLastName());
-            checkoutLabel.setText("Date: " + newValue.getCheckoutDate());
+            if (newValue != null) {
+                idLabel.setText("id: " + newValue.getId());
+                titleLabel.setText("Title: " + newValue.getTitle());
+                authorLabel.setText("Author: " + newValue.getAuthorFirstName() + " " + newValue.getAuthorLastName());
+                studentLabel.setText("Student: " + newValue.getStudentFirstName() + " " + newValue.getStudentLastName());
+                checkoutLabel.setText("Date: " + newValue.getCheckoutDate());
+            } else {
+                idLabel.setText("id: " + oldValue.getId());
+                titleLabel.setText("Title: " + oldValue.getTitle());
+                authorLabel.setText("Author: " + oldValue.getAuthorFirstName() + " " + oldValue.getAuthorLastName());
+                studentLabel.setText("Student: " + oldValue.getStudentFirstName() + " " + oldValue.getStudentLastName());
+                checkoutLabel.setText("Date: " + oldValue.getCheckoutDate());
+            }
         });
 
         tableGroup.getChildren().add(table);
@@ -266,6 +277,7 @@ public class App extends Application {
 
     }
 
+
     public GridPane addSearchBar() {
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -294,6 +306,129 @@ public class App extends Application {
         grid.add(studentBox,3,1);
 
         return grid;
+    }
+
+    public Dialog<List<Book>> addCheckoutDialog(Book startBook) {
+        Dialog<List<Book>> dialog = new Dialog<>();
+        dialog.setTitle("Checkout");
+        dialog.setHeaderText("Checkout Book(s)");
+
+        ButtonType checkoutButtonType = new ButtonType("checkout", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(checkoutButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TableView<Book> checkoutTable = new TableView<>();
+
+        TextField firstName = new TextField();
+        firstName.setPromptText("Student First Name");
+        TextField lastName = new TextField();
+        lastName.setPromptText("Student Last Name");
+
+        grid.add(new Label("Student First Name:"), 0, 0);
+        grid.add(firstName, 0, 1);
+        grid.add(new Label("Student Last Name:"), 1, 0);
+        grid.add(lastName, 1, 1);
+
+        Node checkoutButton = dialog.getDialogPane().lookupButton(checkoutButtonType);
+        checkoutButton.setDisable(true);
+
+        firstName.textProperty().addListener((observabe, oldValue, newValue) -> {
+            if (!firstName.textProperty().get().trim().isEmpty() && !lastName.textProperty().get().trim().isEmpty()) {
+                checkoutButton.setDisable(false);
+            } else {
+                checkoutButton.setDisable(true);
+            }
+        });
+        lastName.textProperty().addListener((observabe, oldValue, newValue) -> {
+            if (!firstName.textProperty().get().trim().isEmpty() && !lastName.textProperty().get().trim().isEmpty()) {
+                checkoutButton.setDisable(false);
+            } else {
+                checkoutButton.setDisable(true);
+            }
+        });
+
+        dialog.getDialogPane().setContent(grid);
+
+        // request focus on the title field by default
+        Platform.runLater(() -> firstName.requestFocus());
+
+        // convert input to Book
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == checkoutButtonType) {
+                book.setStudentFirstName(firstName.getText());
+                book.setStudentLastName(lastName.getText());
+                dbWriter.checkout(book, db);
+                updateTable();
+                return book;
+            }
+            return null;
+        });
+        return dialog;
+    }
+
+    public Dialog<Book> addSimpleCheckoutDialog(Book book) {
+        Dialog<Book> dialog = new Dialog<>();
+        dialog.setTitle("Checkout");
+        dialog.setHeaderText("Enter Student Name.");
+
+        ButtonType checkoutButtonType = new ButtonType("checkout", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(checkoutButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField firstName = new TextField();
+        firstName.setPromptText("Student First Name");
+        TextField lastName = new TextField();
+        lastName.setPromptText("Student Last Name");
+
+        grid.add(new Label("Student First Name:"), 0, 0);
+        grid.add(firstName, 0, 1);
+        grid.add(new Label("Student Last Name:"), 1, 0);
+        grid.add(lastName, 1, 1);
+
+        Node checkoutButton = dialog.getDialogPane().lookupButton(checkoutButtonType);
+        checkoutButton.setDisable(true);
+
+        firstName.textProperty().addListener((observabe, oldValue, newValue) -> {
+            if (!firstName.textProperty().get().trim().isEmpty() && !lastName.textProperty().get().trim().isEmpty()) {
+                checkoutButton.setDisable(false);
+            } else {
+                checkoutButton.setDisable(true);
+            }
+        });
+        lastName.textProperty().addListener((observabe, oldValue, newValue) -> {
+            if (!firstName.textProperty().get().trim().isEmpty() && !lastName.textProperty().get().trim().isEmpty()) {
+                checkoutButton.setDisable(false);
+            } else {
+                checkoutButton.setDisable(true);
+            }
+        });
+
+        dialog.getDialogPane().setContent(grid);
+
+        // request focus on the title field by default
+        Platform.runLater(() -> firstName.requestFocus());
+
+        // convert input to Book
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == checkoutButtonType) {
+                book.setStudentFirstName(firstName.getText());
+                book.setStudentLastName(lastName.getText());
+                dbWriter.checkout(book, db);
+                updateTable();
+                return book;
+            }
+            return null;
+        });
+        return dialog;
+
     }
 
     public void updateTable() {
